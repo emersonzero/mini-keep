@@ -7,7 +7,25 @@ const addNoteBtn = document.querySelector(".add-note");
 
 //Functions
 
+function showNotes() {
+
+    cleanNotes();
+
+    getNotes().forEach((note) => {
+        const noteElement = createNote(note.id, note.content, note.fixed);
+
+        notesContainer.appendChild(noteElement)
+    });
+}
+
+function cleanNotes() {
+    notesContainer.replaceChildren([])
+}
+
 function addNote() {
+
+    //store input values
+    const notes = getNotes();
 
     const noteObject = {
         id: generateId(),
@@ -19,11 +37,19 @@ function addNote() {
 
     //add noteElement in notesContainer
     notesContainer.appendChild(noteElement);
+    notes.push(noteObject);
+
+    saveNotes(notes);
+
+    
+
+    noteInput.value = ""; 
+
 }
 
 //Create note element
 
-//Function for ID not repeat
+    //Function for ID not repeat
 
 function generateId() {
     return Math.floor(Math.random() * 5000);
@@ -31,19 +57,107 @@ function generateId() {
 
 function createNote(id, content, fixed){
     //create the news DOM elements
-    const element = document.createElement("div")
+    const element = document.createElement("div");
     element.classList.add("note")
 
-    const textarea = document.createElement("textarea")
+    const textarea = document.createElement("textarea");
     textarea.value = content //It will filled witch data
     textarea.placeholder = "Add some text"
 
     //add textarea for element(div)
-    element.appendChild(textarea)
+    element.appendChild(textarea);
+
+    const pinIcon = document.createElement("i");
+    pinIcon.classList.add(...["bi", "bi-pin"]);
+    element.appendChild(pinIcon);  
+
+    const deleteIcon = document.createElement("i");
+    deleteIcon.classList.add(...["bi", "bi-x-lg"]);
+    element.appendChild(deleteIcon);     
+    
+    const duplicateIcon = document.createElement("i");
+    duplicateIcon.classList.add(...["bi", "bi-file-earmark-plus"]);
+    element.appendChild(duplicateIcon); 
+
+    if (fixed) {
+        element.classList.add("fixed");
+    }
+
+    //Event element
+    element.querySelector(".bi-pin").addEventListener("click", () => {
+        toggleFixNote(id);
+    });
+
+    element.querySelector(".bi-x-lg").addEventListener("click", () => {
+        deleteNote(id, element);
+    })
+
+    element.querySelector(".bi-file-earmark-plus").addEventListener("click", () => {
+        copyNote(id);
+    })
 
     return element;
+
+}
+
+function toggleFixNote(id) {
+    const notes = getNotes();
+
+    const targetNote = notes.filter((note) => note.id === id)[0];
+
+    targetNote.fixed = !targetNote.fixed;
+
+    saveNotes(notes);
+    showNotes();
+
+}
+
+function deleteNote(id, element) {
+    const notes = getNotes().filter((note) => note.id !== id)
+
+    saveNotes(notes);
+
+    notesContainer.removeChild(element);
+}
+
+function copyNote(id) {
+   const notes = getNotes()
+   
+   const targetNote = notes.filter((note) => note.id ===id)[0]
+
+   const noteObject = {
+    id: generateId(),
+    content: targetNote.content,
+    fixed: false,
+   }
+
+   const noteElement = createNote(noteObject.id, noteObject.content, noteObject.fixed)
+
+   notesContainer.appendChild(noteElement)
+
+   notes.push(noteObject)
+   saveNotes(notes);
+}
+ 
+
+//localStorage
+
+function getNotes(){
+    const notes = JSON.parse(localStorage.getItem("notes") || "[]");
+
+    const orderedNotes = notes.sort((a,b) => (a.fixed > b.fixed ? -1 : 1));
+
+    return orderedNotes;
+}
+
+function saveNotes(notes) {
+    localStorage.setItem("notes", JSON.stringify(notes));
 }
 
 //Event
 
 addNoteBtn.addEventListener("click", () => addNote());
+
+//start
+
+showNotes()
