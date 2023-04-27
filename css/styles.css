@@ -36,14 +36,25 @@ h1 {
 }
 
 #search-input {
+    flex: 1;
     background-color: #525356;
-    border-radius: 8px;
-    border: none;
+    border: 1px solid #525356;
+    color: #fff;
     padding: 10px;
-    font-weight: bold;
-    color: white;
-    width: 600px;
+    border-radius: 5px;
+    width: 500px;
     height: 50px;
+    font-size: 20px;
+   
+}
+
+#search-input:focus {
+    background-color: white;
+    color: black;
+}
+
+#search-input:focus::placeholder {
+    color: black;
 }
 
 #search-input::placeholder{
@@ -86,6 +97,7 @@ h1 {
     background-color: transparent;
     border: 1px solid #525356;
     color: #fff;
+    font-size: 20px;
 }
 
 #note-content::placeholder {
@@ -126,6 +138,8 @@ h1 {
     height: 100%;
     outline: none;
     overflow: hidden;
+    font-size: 20px;
+    font-weight: bold;
 }
 
 .note .bi-pin {
